@@ -1,3 +1,5 @@
+from contextlib import nullcontext
+
 import discord
 from discord.ext import commands
 import logging
@@ -58,7 +60,7 @@ async def r(ctx, arg):
     await ctx.reply(f"Rolagem Teste: " + str(dice1)+ " Total: " + str(dice1[0]+dice1[1]+int(bonus)) + " Esperança/Medo: " + typeroll + " BONUS: " + bonus)
 
 @bot.command()
-async def rt(ctx, arg):
+async def rt(ctx, arg, totalroll=None):
     inicio = 0
     rolls = []
     sinal = []
@@ -91,13 +93,46 @@ async def rt(ctx, arg):
             print(rolls)
             break
 
-    print(rolls)
-    print("len rolls "  + str(len(rolls)))
-    print("len rools[0] " + str(len(rolls[0])))
-    print("len rools[1] " + str(len(rolls[1])))
-    print(sinal)
-    print(bonus)
-    await ctx.reply(rolls)
+    #calculando a rolagem total
+    finalresult = 0
+    mark = 0
+    index_sinal = 0
+    for x in rolls:
+        temp = 0
+        # x é a instancia da primeira rolagem #
+        for z in x: #iterando em cima da primeira rolagem
+            temp += z
+            print(z)
+        if mark == 1:
+            print (sinal[index_sinal])
+            if sinal[index_sinal] == '+':
+                finalresult += temp
+            if sinal[index_sinal] == '-':
+                finalresult -= temp
+            sinal.pop(index_sinal)
+        if mark == 0:
+            mark = 1 #não é mais a primeira rolagem
+            finalresult += temp
+
+
+    #tratamento de bonus
+    for y in bonus:
+        if sinal[index_sinal] == '+':
+            finalresult += int(y)
+        if sinal[index_sinal] == '-':
+            finalresult -= int(y)
+        sinal.pop(index_sinal)
+
+    print("finalresult: " + str(finalresult))
+
+    # armazenando a lista de rolagem para exibição
+    listrollfinal = []
+    for k in rolls:
+        for h in k:
+            listrollfinal.append(h)
+            print(listrollfinal)
+
+    await ctx.reply(f"` {str(finalresult)} ` " + " <------ " + str(listrollfinal) + " + " + str(bonus))
 
 @bot.command()
 async def rt2(ctx, arg):
