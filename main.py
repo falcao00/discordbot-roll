@@ -135,9 +135,26 @@ async def rt(ctx, arg, totalroll=None):
     await ctx.reply(f"` {str(finalresult)} ` " + " <------ " + str(listrollfinal) + " + " + str(bonus))
 
 @bot.command()
-async def rt2(ctx, arg):
-    dice1 = dice.roll(arg)
-    await ctx.send(str(dice1))
+async def dh(ctx, arg: str = ""):
+    dice1 = dice.roll('2d12')
+    resultdice = sum(dice1)
+    if not arg:
+        total = resultdice
+    else:
+        if str(arg[0]) == '+':
+            total = resultdice + int(str(arg[1:]))
+        elif str(arg[0]) == '-':
+            total = resultdice - int(str(arg[1:]))
+        else:
+            total = resultdice
+    if dice1[0] > dice1[1]:
+        fearhope = 'Hope'
+    elif dice1[0] == dice1[1]:
+        fearhope = 'Critical Hope'
+    else:
+        fearhope = 'Fear'
+    print(f"`{total}` <---- {resultdice}{arg}|  {dice1}")
+    await ctx.reply(f"` {total} ` <---- {dice1} {arg} |  {fearhope} ")
 
 
 
